@@ -10,34 +10,50 @@ import {
   Tabs,
   Card,
 } from "react-bootstrap";
-import { Navigate } from "react-router-dom";
-import { auth } from "../config/firebase";
+import { Link, Navigate } from "react-router-dom";
+import { auth } from "../../config/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { AuthContext } from "../config/context";
+import { AuthContextFM } from "./contextApp";
 import { Helmet } from "react-helmet";
+import serverPoint from "./server-point";
 
 function Login({ history }) {
+  const { setuserInfo } = useContext(AuthContextFM);
+
+  const getAccountInfo = async(uid) => {
+    if (currentUser) {
+      await serverPoint.get(`/userentry/${currentUser.uid}`).then((res)=>{
+      const server_response = res.data
+      console.log(server_response);
+      setuserInfo(server_response.data)
+      })
+    }
+  };
+
   const handleLogin = useCallback(
     async (event) => {
       event.preventDefault();
       const { email, password } = event.target.elements;
       try {
-        await signInWithEmailAndPassword(auth, email.value, password.value);
+        await signInWithEmailAndPassword(auth, email.value, password.value).then((res)=>{
+          console.log(res.user.uid);
+          getAccountInfo(res.user.uid)
+        })
       } catch (error) {
         alert(error.message);
       }
     },
     [history]
   );
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser } = useContext(AuthContextFM);
   if (currentUser) {
-    return <Navigate to={"/admin"} />;
+    return <Navigate to={"/transaction"} />;
   }
   return (
     <Container>
       <Helmet>
         <meta charSet="utf-8" />
-        <title>Autolift - Login Admin</title>
+        <title>Xdom - Login</title>
       </Helmet>
       <Row>
         <Col>

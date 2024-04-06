@@ -19,6 +19,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { set, update, remove, ref as RDref, onValue } from "firebase/database";
 import { database } from "../../config/firebase";
 import { AuthContextFM } from "./contextApp";
+import serverPoint from "./server-point";
 
 function Registration() {
   const { userInfo } = useContext(AuthContextFM);
@@ -27,26 +28,31 @@ function Registration() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState(0);
+  const [phone, setphone] = useState('')
+
+  const resetForm = () => { 
+    setEmail("");
+    setPassword("");
+    setFullName("");
+    setRole(0);
+    setphone("")
+   }
 
   const handleRegistration = async () => {
     try {
       await createUserWithEmailAndPassword(auth, email, password).then(
         (res) => {
           console.log(res.user);
-          set(RDref(database, "loginData/" + res.user.uid), {
-            uid: res.user.uid,
-            fullName: fullName,
-            email: email,
-            role: role,
+          serverPoint.post('/userentry',{
+            user_entry_id : res.user.uid,
+            user_entry_name : fullName,
+            Email : email,
+            UserRole : role,
+            Phone : phone
           }).then((res) => {
-            auth.signOut().then(() => {
-              alert("New Account has created!");
-              setEmail("");
-              setPassword("");
-              setFullName("");
-              setRole("");
-            });
+            alert("New Account has created!");
+            resetForm()
           });
         }
       );
@@ -60,37 +66,17 @@ function Registration() {
 
     if (isConfirmed) {
       console.log(userParam, roleValue);
-      update(RDref(database, "loginData/" + userParam.uid), {
-        role: roleValue,
-      })
-        .then(() => {
-          alert("Role berhasil diupdate!");
-        })
-        .catch((error) => {
-          console.error("Error writing data to the database:", error);
-        });
     } else {
       console.log("Update canceled by user");
     }
   };
 
   const getUserData = () => {
-    const dbRefBank = RDref(database, "/loginData");
-
-    onValue(
-      dbRefBank,
-      (snapshot) => {
-        const data = [];
-        snapshot.forEach((childSnapshot) => {
-          const childKey = childSnapshot.key;
-          const childData = childSnapshot.val();
-          data.push(childData);
-        });
-        console.log(data);
-        setuserData(data);
-      },
-      { onlyOnce: false }
-    );
+    serverPoint.get('/userentry').then((res)=>{
+      const server_response = res.data
+      console.log(server_response);
+      setuserData(server_response.data)
+    })
   };
 
   useEffect(() => {
@@ -103,9 +89,6 @@ function Registration() {
         <meta charSet="utf-8" />
         <title>Xdom - Register</title>
       </Helmet>
-      <div style={{ padding: 10, textAlign: "center" }}>
-        <h1>Xdom User Management</h1>
-      </div>
       <Tabs
         defaultActiveKey="profile"
         id="justify-tab-example"
@@ -130,6 +113,15 @@ function Registration() {
                           type="text"
                           placeholder="Enter Full Name"
                           onChange={(e) => setFullName(e.target.value)}
+                        />
+                      </Form.Group>
+                      <Form.Group className="mb-3" controlId="formBasicPhoneNumber">
+                        <Form.Label>Phone Number</Form.Label>
+                        <Form.Control
+                          name="phone"
+                          type='tel'
+                          placeholder="Enter Phone Number"
+                          onChange={(e) => setphone(e.target.value)}
                         />
                       </Form.Group>
                       <Form.Group className="mb-3" controlId="formBasicEmail">
@@ -159,9 +151,9 @@ function Registration() {
                           name="role"
                           onChange={(e) => setRole(e.target.value)}
                         >
-                          <option>== Select One ==</option>
-                          <option>Admin</option>
-                          <option>Staff</option>
+                          <option value={0}>== Select One ==</option>
+                          <option value={1}>Admin</option>
+                          <option value={2}>Staff</option>
                         </Form.Select>
                       </Form.Group>
                       <Button variant="primary" onClick={handleRegistration}>
@@ -182,15 +174,17 @@ function Registration() {
                   <th>id</th>
                   <th>Full Name</th>
                   <th>Email</th>
+                  <th>Phone</th>
                   <th>Role</th>
                 </tr>
               </thead>
               <tbody>
                 {userData.map((item, index) => (
                   <tr key={index}>
-                    <td>{item.uid}</td>
-                    <td>{item.fullName}</td>
-                    <td>{item.email}</td>
+                    <td>{item.user_entry_id}</td>
+                    <td>{item.user_entry_name}</td>
+                    <td>{item.Email}</td>
+                    <td>{item.Phone}</td>
                     <td>
                       <Form.Select
                       disabled={userInfo.uid == item.uid ? true : false}
@@ -201,7 +195,8 @@ function Registration() {
                             roleValue: e.target.value,
                           })
                         }
-                        defaultValue={item.role}
+                        defaultValue={item.UserRole}
+                        value={item.UserRole}
                       >
                         <option>Admin</option>
                         <option>Staff</option>

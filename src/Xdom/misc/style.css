@@ -1,3 +1,14 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#app {
+  height: 100%;
+  background-color: #f0f0f0; /* Optional: Adding a background color to visualize the full height */
+}
+
 nav {
   display: flex;
   justify-content: space-between;
@@ -7,7 +18,8 @@ nav {
 }
 
 .logo {
-  font-size: 20px;
+  width: '50px';
+  height: auto;
 }
 
 .tabs {
@@ -38,9 +50,17 @@ table {
   padding: 5px 10px;
 }
 
+.table-container {
+  overflow-x: auto;
+}
+
 th, td {
   border: 1px solid #ddd;
   padding: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border: 1px solid #ddd; /* Border for better visibility */
 }
 
 th {
@@ -58,6 +78,10 @@ button{
 .formTable td {
   border-collapse: collapse;
   border: 0;
+}
+
+.sidenav{
+  background-color: #b5cfe9;
 }
 
 /* EmptyData.css */
@@ -83,4 +107,16 @@ input[type=number]::-webkit-outer-spin-button {
 input[type=number]::-webkit-inner-spin-button, 
 input[type=number]::-webkit-outer-spin-button {
   opacity: 1;
+}
+
+.centered-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.contentlogin {
+  width: 30%;
 }
