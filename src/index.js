@@ -5,8 +5,6 @@ import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
 import "./Resources/Hahmlet/Hahmlet-VariableFont_wght.ttf";
-import App from "./App";
-import TestFile from "./Test/loginTest";
 import Xdoms from "./Xdom/MainApp";
 
 import reportWebVitals from "./reportWebVitals";
