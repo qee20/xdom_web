@@ -1,76 +1,39 @@
-import React, { useEffect, useState } from "react";
-import Cookies from "js-cookie";
-import CryptoJS from "crypto-js";
+import React from 'react';
+import Header from './Header';
+import Sidebar from './Sidebar';
+import { Outlet } from 'react-router-dom';
 
-function Home() {
-  const initialData = [
-    { id: 1, name: "Sony" },
-    { id: 4, name: "Motorolla" },
-    { id: 5, name: "Samsung" },
-    { id: 2, name: "Iphone" },
-    { id: 3, name: "Xiaomi" },
-  ];
-
-  const [newData, setnewData] = useState([]);
-
-  const updateOrder = ({ e, currentPos }) => {
-    console.log(`current : ${currentPos} ,  target : ${e.target.value}`);
-
-    // Get the new position from the select value
-    const newPos = e.target.value;
-    // Update the state of the newData array
-    setnewData((prevState) => {
-      // Make a copy of the previous state
-      const newState = [...prevState];
-      // Find the index of the item in the newState array
-      const index = newState.findIndex((item) => item.id === currentPos);
-      // Remove the item from its current position
-      const [item] = newState.splice(index, 1);
-      // Insert the item to the new position
-      newState.splice(newPos - 1, 0, item);
-      // Return the newState array
-      return newState;
-    });
-
-    console.log("original", initialData);
-    console.log("new", newData);
-  };
-  
-
-  useEffect(() => {
-    setnewData(initialData);
-  }, []);
-
-  initialData.sort((a, b) => a.id - b.id);
-
+function App() {
   return (
-    <div>
-      <h1>Thunder</h1>
-      {newData.map((item) => (
-        <div
-          key={item.id}
-          style={{
-            margin: 5,
-            border: "1px solid black",
-            borderRadius: "15px",
-            width: "100px",
-            height: "auto",
-            padding: 5,
-          }}
-        >
-          <select
-            value={item.id}
-            onChange={(e) => updateOrder({ e, currentPos: item.id })}
-          >
-            {newData.map((item2) => (
-              <option>{item2.id}</option>
-            ))}
-          </select>
-          <div>{item.name}</div>
+    <div className="App">
+      <Header />
+      <div className="container-fluid">
+        <div className="row">
+          <Sidebar />
+          <main className="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+          <div>
+        <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+      <h1 className="h2">Dashboard</h1>
+      <div className="btn-toolbar mb-2 mb-md-0">
+        <div className="btn-group me-2">
+          <button type="button" className="btn btn-sm btn-outline-secondary">Share</button>
+          <button type="button" className="btn btn-sm btn-outline-secondary">Export</button>
         </div>
-      ))}
+        <button type="button" className="btn btn-sm btn-outline-secondary dropdown-toggle">
+          <span data-feather="calendar"></span>
+          This week
+        </button>
+      </div>
+    </div>
+    <div className="overflow-auto" style={{ maxHeight: '500px' }}>
+        <Outlet/>
+    </div>
+    </div>
+          </main>
+        </div>
+      </div>
     </div>
   );
 }
 
-export default Home;
+export default App;
